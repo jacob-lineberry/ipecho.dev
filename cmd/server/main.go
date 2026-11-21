@@ -93,7 +93,7 @@ func main() {
 	// start server in background goroutine
 	errCh := make(chan error, 1)
 	go func() {
-		log.Printf("ipecho %s listening on %s", version, addr)
+		log.Printf("ipecho %s listening on %s", version, addr) //nolint:gosec // G706: version is set at build time and addr comes from the PORT env var
 		errCh <- srv.ListenAndServe()
 	}()
 
