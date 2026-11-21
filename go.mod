@@ -1,4 +1,4 @@
-module github.com/jacob-lineberry/ipecho-api
+module github.com/jacob-lineberry/ipecho.dev
 
 go 1.25.5
 

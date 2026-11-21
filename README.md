@@ -1,12 +1,12 @@
-# ipecho-api
+# ipecho.dev
 
-[![Go Version](https://img.shields.io/github/go-mod/go-version/jacob-lineberry/ipecho-api)](https://github.com/jacob-lineberry/ipecho-api)
-[![Build Status](https://github.com/jacob-lineberry/ipecho-api/actions/workflows/deploy.yaml/badge.svg)](https://github.com/jacob-lineberry/ipecho-api/actions/workflows/deploy.yaml)
-[![License](https://img.shields.io/github/license/jacob-lineberry/ipecho-api)](https://github.com/jacob-lineberry/ipecho-api/blob/main/LICENSE)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/jacob-lineberry/ipecho.dev)](https://github.com/jacob-lineberry/ipecho.dev)
+[![Build Status](https://github.com/jacob-lineberry/ipecho.dev/actions/workflows/deploy.yaml/badge.svg)](https://github.com/jacob-lineberry/ipecho.dev/actions/workflows/deploy.yaml)
+[![License](https://img.shields.io/github/license/jacob-lineberry/ipecho.dev)](https://github.com/jacob-lineberry/ipecho.dev/blob/main/LICENSE)
 
 Simple question, simple answer: what's my IP? That's what this service does.
 
-**ipecho-api** is a lightweight, performant "What is my IP?" REST API service built with Go and deployed on Google Cloud Run. It's designed to be fast, secure, and easily consumable by humans and machines alike (especially via `curl`).
+**ipecho.dev** is a lightweight, performant "What is my IP?" REST API service built with Go and deployed on Google Cloud Run. It's designed to be fast, secure, and easily consumable by humans and machines alike (especially via `curl`).
 
 ## Usage
 
@@ -70,8 +70,8 @@ A simple health check endpoint used for monitoring and Cloud Run probes.
 ### Running Locally
 1. Clone the repository:
    ```bash
-   git clone https://github.com/jacob-lineberry/ipecho-api.git
-   cd ipecho-api
+   git clone https://github.com/jacob-lineberry/ipecho.dev.git
+   cd ipecho.dev
    ```
 2. Start the server:
    ```bash
