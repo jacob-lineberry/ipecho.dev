@@ -5,8 +5,8 @@ go 1.27.0
 toolchain go1.27.4
 
 require (
-	github.com/go-chi/chi/v5 v5.4.0
-	github.com/go-chi/httprate v0.15.0
+	github.com/go-chi/chi/v5 v5.5.0
+	github.com/go-chi/httprate v0.16.1
 )
 
 require (
