@@ -1,11 +1,11 @@
-# syntax=docker/dockerfile:experimental
-
-ARG GO_VERSION=1.25.5
+# syntax=docker/dockerfile:1
 
 # ========================================
 # build stage: compile static go binary
 # ========================================
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS build
+# base images are pinned by digest; dependabot bumps the tag and digest together.
+# the golang image sets GOTOOLCHAIN=local, so a go.mod newer than this image fails the build.
+FROM --platform=$BUILDPLATFORM golang:1.27.4-alpine@sha256:70bd7ddea8b6cbe5d6943cde279d6b67feb10cc924fb9100d1d8757c1575b280 AS build
 
 WORKDIR /src
 
@@ -21,9 +21,10 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 COPY cmd ./cmd
 COPY internal ./internal
 
-# build args for cross-platform compilation
+# build args for cross-platform compilation and version stamping
 ARG TARGETOS
 ARG TARGETARCH
+ARG VERSION=dev
 
 # build static binary with optimizations
 # cache mount for go-build speeds up repeated builds
@@ -33,14 +34,14 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
   GOARCH=${TARGETARCH:-amd64} \
   go build \
   -trimpath \
-  -ldflags="-s -w" \
+  -ldflags="-s -w -X main.version=${VERSION}" \
   -o /out/ipecho-api \
   ./cmd/server
 
 # ========================================
 # runtime stage: minimal distroless image
 # ========================================
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM gcr.io/distroless/static-debian12:nonroot@sha256:afa5c872c891853ca7fcf1f12c3edb23f7eeef36189728842dd51042ff57f7ab
 
 # OCI labels for supply chain tracking
 ARG VERSION=dev
