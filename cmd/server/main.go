@@ -19,6 +19,9 @@ import (
 	ipmw "github.com/jacob-lineberry/ipecho.dev/internal/middleware"
 )
 
+// version is set at build time with -ldflags "-X main.version=...".
+var version = "dev"
+
 func main() {
 	// GCR provides PORT environment variable
 	// Default to 8080 for local development
@@ -90,7 +93,7 @@ func main() {
 	// start server in background goroutine
 	errCh := make(chan error, 1)
 	go func() {
-		log.Printf("ipecho listening on %s", addr)
+		log.Printf("ipecho %s listening on %s", version, addr)
 		errCh <- srv.ListenAndServe()
 	}()
 
