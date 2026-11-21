@@ -45,7 +45,7 @@ func PlainIP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write([]byte(ip + "\n"))
+	_, _ = w.Write([]byte(ip + "\n")) //nolint:gosec // G705: text/plain response holding an IP address, never rendered as HTML
 }
 
 // JSONIP returns the client's IP address as JSON.
