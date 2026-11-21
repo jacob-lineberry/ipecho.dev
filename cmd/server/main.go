@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -65,10 +66,10 @@ func main() {
 	// rate-limited routes group
 	r.Group(func(r chi.Router) {
 		// rate limit: 120 requests per minute per client
-		r.Use(httprate.Limit(
+		r.Use(httprate.LimitBy(
 			120,
 			1*time.Minute,
-			httprate.WithKeyFuncs(rateLimitKeyFromContext),
+			rateLimitKeyFromContext,
 			httprate.WithLimitHandler(func(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
 			}),
@@ -128,17 +129,21 @@ func main() {
 }
 
 // RateLimitKeyFromContext extracts the client from request context
-// for use as the rate limiting key. falls back to httprate.KeyByIP
-// if context value is missing.
+// for use as the rate limiting key. falls back to the connection's address
+// if the context value is missing. IPv6 addresses are reduced to their /64 so
+// a client cannot get a fresh bucket by rotating addresses inside its own block.
 func rateLimitKeyFromContext(r *http.Request) (string, error) {
 	// try to get IP from context set by CloudflareClientIP middleware
 	if v := r.Context().Value(ipmw.ClientIPKey); v != nil {
 		if s, ok := v.(string); ok && s != "" {
-			return s, nil
+			return httprate.CanonicalizeIP(s), nil
 		}
 	}
 
-	// fallback: use httprate's default IP extraction
-	// (should rarely happen if middleware is configured correctly)
-	return httprate.KeyByIP(r)
+	// fallback: the TCP peer (should rarely happen if middleware is configured correctly)
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr // no port present, use as-is
+	}
+	return httprate.CanonicalizeIP(host), nil
 }
