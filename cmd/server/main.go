@@ -15,8 +15,8 @@ import (
 	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
 
-	"github.com/jacob-lineberry/ipecho-api/internal/handlers"
-	ipmw "github.com/jacob-lineberry/ipecho-api/internal/middleware"
+	"github.com/jacob-lineberry/ipecho.dev/internal/handlers"
+	ipmw "github.com/jacob-lineberry/ipecho.dev/internal/middleware"
 )
 
 func main() {

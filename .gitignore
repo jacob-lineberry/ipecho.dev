@@ -29,3 +29,6 @@ go.work.sum
 
 # Editor/IDE
 lazy-lock.json
+
+# Built binary (go build ./cmd/server)
+/server

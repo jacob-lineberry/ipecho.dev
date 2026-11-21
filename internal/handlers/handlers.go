@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/netip"
 
-	ipmw "github.com/jacob-lineberry/ipecho-api/internal/middleware"
+	ipmw "github.com/jacob-lineberry/ipecho.dev/internal/middleware"
 )
 
 // clientIP retrieves the client IP from request context.
