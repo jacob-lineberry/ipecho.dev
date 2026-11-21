@@ -4,7 +4,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/httprate"
 
 	"github.com/jacob-lineberry/ipecho.dev/internal/handlers"
+	"github.com/jacob-lineberry/ipecho.dev/internal/logging"
 	ipmw "github.com/jacob-lineberry/ipecho.dev/internal/middleware"
 )
 
@@ -23,6 +24,9 @@ import (
 var version = "dev"
 
 func main() {
+	// structured JSON logs on stdout, in the fields Cloud Logging reads
+	slog.SetDefault(logging.New(os.Stdout))
+
 	// GCR provides PORT environment variable
 	// Default to 8080 for local development
 	port := os.Getenv("PORT")
@@ -35,17 +39,15 @@ func main() {
 	r := chi.NewRouter()
 
 	// middleware stack, in order:
-	// RequestID -> CloudflareClientIP -> Logger -> Recoverer -> CleanPath -> Timeout
-
-	// RequestID: assign unique ID to each request for tracing
-	r.Use(chimw.RequestID)
+	// CloudflareClientIP -> Recoverer -> CleanPath -> Timeout
+	//
+	// there is no per-request logger on purpose: Cloud Run's own request log
+	// already records the method, URL, status and latency of every request, and
+	// this service does not log client IP addresses.
 
 	// CloudflareClientIP: read the client IP from CF-Connecting-IP
 	// must come before the rate limiter
 	r.Use(ipmw.CloudflareClientIP())
-
-	// Logger: log request details
-	r.Use(chimw.Logger)
 
 	// Recoverer: recovers from panics, returns HTTP 500
 	r.Use(chimw.Recoverer)
@@ -92,7 +94,7 @@ func main() {
 	// start server in background goroutine
 	errCh := make(chan error, 1)
 	go func() {
-		log.Printf("ipecho %s listening on %s", version, addr) //nolint:gosec // G706: version is set at build time and addr comes from the PORT env var
+		slog.Info("listening", "version", version, "addr", addr)
 		errCh <- srv.ListenAndServe()
 	}()
 
@@ -104,11 +106,12 @@ func main() {
 	// wait for either shutdown signal or server error
 	select {
 	case sig := <-sigCh:
-		log.Printf("signal received: %s; initiating graceful shutdown", sig.String())
+		slog.Info("shutting down", "signal", sig.String())
 	case err := <-errCh:
 		// server exited unexpectedly
 		if err != nil && err != http.ErrServerClosed {
-			log.Fatalf("server error: %v", err)
+			slog.Error("server error", "error", err)
+			os.Exit(1)
 		}
 		return
 	}
@@ -118,9 +121,9 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Printf("shutdown error: %v", err)
+		slog.Error("shutdown error", "error", err)
 	} else {
-		log.Println("server stopped gracefully")
+		slog.Info("server stopped")
 	}
 }
 
