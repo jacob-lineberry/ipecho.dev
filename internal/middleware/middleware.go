@@ -11,9 +11,11 @@ type contextKey string
 
 const ClientIPKey contextKey = "clientIP"
 
-// CloudRunClientIP returns middleware that extracts the real client IP
-// from X-Forwarded-For header set by Cloud Run's load balancer.
-func CloudRunClientIP() func(http.Handler) http.Handler {
+// CloudflareClientIP returns middleware that stores the client IP from the
+// CF-Connecting-IP header in the request context. Cloudflare sets that header,
+// so the service must only be reached through Cloudflare. A missing or
+// malformed header leaves the context value empty.
+func CloudflareClientIP() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var clientIP string

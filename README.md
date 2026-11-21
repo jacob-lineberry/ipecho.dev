@@ -65,7 +65,7 @@ A simple health check endpoint used for monitoring and Cloud Run probes.
 ## Local Development
 
 ### Prerequisites
-- **Go**: Version 1.25.5 or higher.
+- **Go**: Version 1.27 or higher (see `go.mod`).
 
 ### Running Locally
 1. Clone the repository:
@@ -119,10 +119,10 @@ The project is configured for automated deployment via GitHub Actions.
 
 ## Architecture
 
-The service is designed to work efficiently behind a load balancer.
+The service is designed to run on Cloud Run behind Cloudflare.
 
-1. **IP Extraction**: Custom middleware extracts the real client IP from the `X-Forwarded-For` header set by Cloud Run. It correctly identifies the original requester by taking the leftmost IP address.
-2. **Context-Based**: The extracted IP is stored in the request context. This ensures that the rate limiter (using `go-chi/httprate`) and handlers are all looking at the same verified IP address.
+1. **IP Extraction**: Custom middleware reads the client IP from the `CF-Connecting-IP` header that Cloudflare sets, and ignores the header when it is missing or not a valid IP address.
+2. **Context-Based**: The extracted IP is stored in the request context. This ensures that the rate limiter (using `go-chi/httprate`) and handlers are all looking at the same IP address.
 3. **Graceful Shutdown**: The server listens for `SIGTERM` (sent by Cloud Run before scaling down) and `SIGINT`, allowing 10 seconds for in-flight requests to complete.
 4. **Rate Limiting**: Rate limiting is applied per-instance based on the extracted client IP.
 

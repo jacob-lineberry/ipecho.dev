@@ -1,4 +1,4 @@
-// Package handlers provide HTTP handlers for the ipecho-api service.
+// Package handlers provides HTTP handlers for the ipecho.dev service.
 // It includes endpoints for returning client IP addresses in plaintext and JSON formats.
 package handlers
 
@@ -14,7 +14,7 @@ import (
 // clientIP retrieves the client IP from request context.
 // falls back to parsing RemoteAddr if context value is missing.
 func clientIP(r *http.Request) string {
-	// try context first (set by CloudRunClientIP middleware)
+	// try context first (set by CloudflareClientIP middleware)
 	if v := r.Context().Value(ipmw.ClientIPKey); v != nil {
 		if s, ok := v.(string); ok && s != "" {
 			return s

@@ -1,4 +1,4 @@
-// Command server runs the ipecho-api HTTP server for GCR.
+// Command server runs the ipecho.dev HTTP service on Cloud Run.
 // It returns the client's IP address via simple REST endpoints.
 package main
 
@@ -34,18 +34,17 @@ func main() {
 	// initialize chi router
 	r := chi.NewRouter()
 
-	// middleware stack
-	// Context7/chi recommended order:
-	// RequestID -> RealIP -> Logger -> Recoverer -> CleanPath -> Timeout
+	// middleware stack, in order:
+	// RequestID -> CloudflareClientIP -> Logger -> Recoverer -> CleanPath -> Timeout
 
 	// RequestID: assign unique ID to each request for tracing
 	r.Use(chimw.RequestID)
 
-	// CloudRunClientIP: extract real client IP from X-Forwarded-For
-	// must come before Logger and rate limiter
-	r.Use(ipmw.CloudRunClientIP())
+	// CloudflareClientIP: read the client IP from CF-Connecting-IP
+	// must come before the rate limiter
+	r.Use(ipmw.CloudflareClientIP())
 
-	// Logger: log request details (now with real client IP)
+	// Logger: log request details
 	r.Use(chimw.Logger)
 
 	// Recoverer: recovers from panics, returns HTTP 500
@@ -129,7 +128,7 @@ func main() {
 // for use as the rate limiting key. falls back to httprate.KeyByIP
 // if context value is missing.
 func rateLimitKeyFromContext(r *http.Request) (string, error) {
-	// try to get IP from context set by CloudRunClientIP middleware
+	// try to get IP from context set by CloudflareClientIP middleware
 	if v := r.Context().Value(ipmw.ClientIPKey); v != nil {
 		if s, ok := v.(string); ok && s != "" {
 			return s, nil

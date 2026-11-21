@@ -42,7 +42,6 @@ go.work.sum
 .DS_Store
 
 # documentation 
-AGENTS.md
 README.md
 LICENSE
 
