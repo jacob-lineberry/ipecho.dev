@@ -1,7 +1,7 @@
 # ipecho.dev
 
 [![Go Version](https://img.shields.io/github/go-mod/go-version/jacob-lineberry/ipecho.dev)](https://github.com/jacob-lineberry/ipecho.dev)
-[![Build Status](https://github.com/jacob-lineberry/ipecho.dev/actions/workflows/deploy.yaml/badge.svg)](https://github.com/jacob-lineberry/ipecho.dev/actions/workflows/deploy.yaml)
+[![CI](https://github.com/jacob-lineberry/ipecho.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/jacob-lineberry/ipecho.dev/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/jacob-lineberry/ipecho.dev)](https://github.com/jacob-lineberry/ipecho.dev/blob/main/LICENSE)
 
 Simple question, simple answer: what's my IP? That's what this service does.
@@ -109,7 +109,7 @@ The final image uses a multi-stage build and is based on `gcr.io/distroless/stat
 
 The project is configured for automated deployment via GitHub Actions.
 
-- **Workflow**: `.github/workflows/deploy.yaml`
+- **Workflow**: `.github/workflows/deploy.yml`, on pushes to `main` that change the service, on `v*` tags, or manually (`gh workflow run deploy.yml`)
 - **Target**: Google Cloud Run (`us-central1`)
 - **Authentication**: Uses Workload Identity Federation (WIF).
 - **Secrets Required**: 
