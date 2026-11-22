@@ -32,3 +32,8 @@ lazy-lock.json
 
 # Built binary (go build ./cmd/server)
 /server
+
+# Local AI agent tooling, not tracked
+.claude/
+.agents/
+openspec/
