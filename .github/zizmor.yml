@@ -1,0 +1,9 @@
+rules:
+  # deploy.yaml is replaced wholesale in the planned service rebuild; until then, editing it on main
+  # triggers a production deploy, so these findings are tracked for the rebuild instead of fixed here.
+  artipacked:
+    ignore: [deploy.yaml]
+  template-injection:
+    ignore: [deploy.yaml]
+  unpinned-uses:
+    ignore: [deploy.yaml]
